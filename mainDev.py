@@ -19,16 +19,22 @@ client=session.client('ec2')
 all_regions=client.describe_regions()
 
 # Listing as list of key Region:
-#pprint.pprint(all_regions['Regions'])
-all_regions=client.describe_regions()
+#all_regions=client.describe_regions()
+# pprint.pprint(all_regions['Regions'])
 
 list_of_regions=[]
 for each_reg in all_regions['Regions']:
     list_of_regions.append(each_reg['RegionName'])
-
+# Prints list of regions
 print(list_of_regions)
 # Prints list of regionNames:
 #    print(each_reg['RegionName']
+for each_reg in list_of_regions:
+    session=boto3.Session(region_name=each_reg)
+    resource=session.resource('ec2')
+    print("List of EC2 instances from the region: ",each_reg)
+    for each_in in resource.instances.all():
+        print(each_in.id,each_in.state['Name'])
 
 # Customizing sessions:
 """
