@@ -58,7 +58,4 @@ for each_prof in aws_prof:
         resource=session.client('elbv2')
         print(each_reg," -- APP/NET ELBs:")
         for each in resource.describe_load_balancers()['LoadBalancers']:
-            #for each_in in each['LoadBalancerName']:
-            #print(each)
             print("-->  ",each_reg," -- ",each['LoadBalancerName']," -- ",each['Type'])
-                #print('each_in.LoadBalancerName', 'each_in.DNSName')
