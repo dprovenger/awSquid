@@ -1,7 +1,7 @@
 import boto3
 
 # List of aws profiles
-aws_prof=['default']
+aws_prof=['default', 'jarrieta-awscli']
 # Multiple profiles:
 # aws_prof=['default', 'default']
 
