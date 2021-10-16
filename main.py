@@ -21,7 +21,22 @@ for each_prof in aws_prof:
         resource=session.resource('ec2')
         print("Region:",each_reg)
         for each_in in resource.instances.all():
-            print("      -",each_reg,"-- Instance ID:",each_in.id,"-- Instance State:",each_in.state['Name'])
+            mac = ""
+            for iface in each_in.network_interfaces:
+                mac = iface.mac_address
+            ins_name = ""
+            run_af_hrs = ""
+            env = ""
+            for tags in each_in.tags:
+                if tags["Key"] == 'Name':
+                    ins_name = tags["Value"]
+                if tags["Key"] == 'RunAfterHours':
+                    run_af_hrs = tags["Value"]
+                if tags["Key"] == 'Environment':
+                    env = tags["Value"]        
+            #print("      -",each_reg,"-- Instance ID:",each_in.id,"-- Instance State:",each_in.state['Name'])
+            print(ins_name,each_in.id,each_in.public_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type)
+
 
 # List of Regions and Classic ELBs with in each region
 for each_prof in aws_prof:
@@ -59,3 +74,4 @@ for each_prof in aws_prof:
         print("Region -",each_reg)
         for each in resource.describe_load_balancers()['LoadBalancers']:
             print("       -",each_reg,"-- ELB Name:",each['LoadBalancerName'],"-- ELB Type:",each['Type'])
+
