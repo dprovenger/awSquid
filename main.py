@@ -35,7 +35,7 @@ for each_prof in aws_prof:
                 if tags["Key"] == 'Environment':
                     env = tags["Value"]        
             #print("      -",each_reg,"-- Instance ID:",each_in.id,"-- Instance State:",each_in.state['Name'])
-            print(ins_name,each_in.id,each_in.public_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type)
+            print(ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type)
 
 
 # List of Regions and Classic ELBs with in each region
