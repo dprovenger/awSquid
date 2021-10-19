@@ -1,4 +1,5 @@
 import boto3
+import csv
 
 # List of aws profiles
 aws_prof=['jarrieta-awscli']
@@ -16,6 +17,9 @@ for each_prof in aws_prof:
     list_of_regions=[]
     for each_reg in all_regions['Regions']:
         list_of_regions.append(each_reg['RegionName'])
+    ins_file=open('output/' + each_prof + '-ec2_invent.csv','w',newline='')
+    ins_data=csv.writer(ins_file)
+    ins_data.writerow(['Name','Instance','IP','MacAddress','Environment','Platform','OS','RunAfterHours','InstanceType'])
     for each_reg in list_of_regions:
         session=boto3.Session(profile_name=each_prof,region_name=each_reg)
         resource=session.resource('ec2')
@@ -34,8 +38,8 @@ for each_prof in aws_prof:
                     run_af_hrs = tags["Value"]
                 if tags["Key"] == 'Environment':
                     env = tags["Value"]        
-            #print("      -",each_reg,"-- Instance ID:",each_in.id,"-- Instance State:",each_in.state['Name'])
-            print(ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type)
+            ins_data.writerow([ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type])
+    ins_file.close()
 
 
 # List of Regions and Classic ELBs with in each region
@@ -53,10 +57,7 @@ for each_prof in aws_prof:
         resource=session.client('elb')
         print("Region -",each_reg)
         for each in resource.describe_load_balancers()['LoadBalancerDescriptions']:
-            #for each_in in each['LoadBalancerName']:
-            #print(each)
             print("       -",each_reg,"-- Classic ELB Name:",each['LoadBalancerName'])
-                #print('each_in.LoadBalancerName', 'each_in.DNSName')
 
 # List of Regions and App/Net ELBs with in each region
 for each_prof in aws_prof:
@@ -74,4 +75,3 @@ for each_prof in aws_prof:
         print("Region -",each_reg)
         for each in resource.describe_load_balancers()['LoadBalancers']:
             print("       -",each_reg,"-- ELB Name:",each['LoadBalancerName'],"-- ELB Type:",each['Type'])
-
