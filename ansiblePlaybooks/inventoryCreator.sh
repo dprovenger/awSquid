@@ -7,5 +7,5 @@ if [[ $1 = "" ]]; then
   echo -e "Tenant's inventory file must exist in output dir \n"
 else
   echo '[linux]' > ansibleInventoryFiles/$1"-hosts"
-  for h in `cat ../output/$file | grep -v Name`; do echo $h | awk -F "," '{print $3 " " $1}' >> ansibleInventoryFiles/$1"-hosts"; done
+  for h in `grep Linux ../output/$file`; do echo $h | awk -F "," '{print $3 " " $1}' >> ansibleInventoryFiles/$1"-hosts"; done
 fi 
