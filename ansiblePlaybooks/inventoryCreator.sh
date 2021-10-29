@@ -2,8 +2,8 @@
 file=$1"-ec2_invent.csv"
 
 if [[ $1 = "" ]]; then
-  echo -e "\nSample Usage I: $0 C3"
-  echo -e "Sample Usage II: $0 C101"
+  echo -e "\nUsage Example I: $0 C3"
+  echo -e "Usage Example II: $0 C101"
   echo -e "Tenant's inventory file must exist in output dir \n"
 else
   echo '[linux]' > ansibleInventoryFiles/$1"-hosts"
