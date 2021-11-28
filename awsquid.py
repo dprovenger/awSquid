@@ -3,13 +3,17 @@ import csv
 import sys
 from typing import Dict, List
 
-tenants = ['TENANT1', 'TENANT2']
+# Global Variables To Configure Begin:
+tenants = ['TENANT1', 'TENANT2', 'jarrieta-awscli']
+default_region = 'us-east-2'
+# Global Variables End:
+
 
 def main() -> None:
     """Entrypoint of program."""
     args: Dict[str, str] = read_args()
 
-# AWS Section 
+# AWS Section Begins:
 def aws_options():
     """AWS options of tasks (EC2 and ELB)"""
     if len(sys.argv) == 2:
@@ -39,9 +43,8 @@ def aws_options():
 
 def aws_ec2():
     each_prof = sys.argv[2]
-    print('')
-    print('== Profile -',each_prof,'-- EC2 instances == ')
-    session=boto3.Session(profile_name=each_prof,region_name='us-east-2')
+    print('\n' + each_prof + '\'s EC2 Instances Inventory: \n')
+    session=boto3.Session(profile_name=each_prof,region_name=default_region)
     client=session.client('ec2')
     all_regions=client.describe_regions()
     list_of_regions=[]
@@ -69,30 +72,62 @@ def aws_ec2():
                 if tags["Key"] == 'Environment':
                     env = tags["Value"]        
             ins_data.writerow([ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type])
-            print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent.csv')
+            print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent.csv\n')
     ins_file.close()
     exit()
 
 def aws_elb():
-    print("Welcome to AWS ELB section")
-    exit()
+    each_prof = sys.argv[2]
+    print('\n' + each_prof + '\'s Classic ELBs Inventory: \n')
+    session=boto3.Session(profile_name=each_prof,region_name=default_region)
+    client=session.client('ec2')
+    all_regions=client.describe_regions()
+    list_of_regions=[]
+    for each_reg in all_regions['Regions']:
+        list_of_regions.append(each_reg['RegionName'])
+    for each_reg in list_of_regions:
+        session=boto3.Session(profile_name=each_prof,region_name=each_reg)
+        resource=session.client('elb')
+        print("Auditing region",each_reg)
+        for each in resource.describe_load_balancers()['LoadBalancerDescriptions']:
+            print("       -",each_reg,"-- Classic ELB Name:",each['LoadBalancerName'])
 
-# AZURE Section:
+    print('')
+    print('\n' + each_prof + '\'s App/Net ELBs Inventory:\n')
+    session=boto3.Session(profile_name=each_prof,region_name=default_region)
+    client=session.client('ec2')
+    all_regions=client.describe_regions()
+    list_of_regions=[]
+    for each_reg in all_regions['Regions']:
+        list_of_regions.append(each_reg['RegionName'])
+    for each_reg in list_of_regions:
+        session=boto3.Session(profile_name=each_prof,region_name=each_reg)
+        resource=session.client('elbv2')
+        print("Auditing region -",each_reg)
+        for each in resource.describe_load_balancers()['LoadBalancers']:
+            print("       -",each_reg,"-- ELB Name:",each['LoadBalancerName'],"-- ELB Type:",each['Type'])
+    exit()
+# AWS Section Ends:
+
+# AZURE Section Begins:
 def azure_options():
     print("\n Azure options currently not available\n")
     exit()
+# AZURE Section Ends:
 
-# GCP Section:
+# GCP Section Begins:
 def gcp_options():
     print("\n GCP options currently not available\n")
     exit()
+# GCP Section Ends:
 
-# OCI Section:
+# OCI Section Begins:
 def oci_options ():
     print("\n OCI options currently not available\n")
     exit()
+# OCI Section Ends:
 
-# Section of all MSPs
+# Section of all MSPs Begins:
 def usage_help_arg():
     """Usage examples and syntax"""
     print("\n Usage: python3 awsquid.py MSP TENANT TASK")
@@ -101,6 +136,7 @@ def usage_help_arg():
     print(" Example: python3 awsquid.py OCI CID# HELP")
     print(" Example: python3 awsquid.py GCP CID# HELP")
     print(" Example: python3 awsquid.py AZURE CID# HELP\n")
+# Section for all MSPs Ends:
 
 def read_args() -> Dict[str, str]:
     """Check for valid CLI arguments"""
