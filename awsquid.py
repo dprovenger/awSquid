@@ -57,6 +57,7 @@ def aws_ec2():
         session=boto3.Session(profile_name=each_prof,region_name=each_reg)
         resource=session.resource('ec2')
         print("Auditing region",each_reg)
+        ec2s_found = 0
         for each_in in resource.instances.all():
             mac = ""
             for iface in each_in.network_interfaces:
@@ -72,7 +73,10 @@ def aws_ec2():
                 if tags["Key"] == 'Environment':
                     env = tags["Value"]        
             ins_data.writerow([ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type])
+            ec2s_found += 1
+        if ec2s_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent.csv\n')
+            exit()
     ins_file.close()
     exit()
 
@@ -111,26 +115,26 @@ def aws_elb():
 
 # AZURE Section Begins:
 def azure_options():
-    print("\n Azure options currently not available\n")
+    print("\n No Azure options available at this time!\n")
     exit()
 # AZURE Section Ends:
 
 # GCP Section Begins:
 def gcp_options():
-    print("\n GCP options currently not available\n")
+    print("\n No GCP options available at this time!\n")
     exit()
 # GCP Section Ends:
 
 # OCI Section Begins:
 def oci_options ():
-    print("\n OCI options currently not available\n")
+    print("\n No OCI options available at this time!\n")
     exit()
 # OCI Section Ends:
 
 # Section of all MSPs Begins:
 def usage_help_arg():
     """Usage examples and syntax"""
-    print("\n Usage: python3 awsquid.py MSP TENANT TASK")
+    print("\n Usage is case sensitive: python3 awsquid.py MSP TENANT TASK")
     print(" Example: python3 awsquid.py AWS CID# EC2")
     print(" Example: python3 awsquid.py AWS CID# ELB")
     print(" Example: python3 awsquid.py OCI CID# HELP")
