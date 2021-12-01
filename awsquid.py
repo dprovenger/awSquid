@@ -76,7 +76,7 @@ def aws_ec2():
             ec2s_found += 1
         if ec2s_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent.csv\n')
-            exit()
+        exit()
     ins_file.close()
     exit()
 
