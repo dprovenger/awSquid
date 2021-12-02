@@ -1,11 +1,15 @@
 import boto3
 import csv
 import sys
+import datetime
 from typing import Dict, List
 
-# Global Variables To Configure Begin:
+# Global Variables To Configure:
 tenants = ['TENANT1', 'TENANT2', 'jarrieta-awscli']
 default_region = 'us-east-2'
+
+# Default Global Variables:
+time_now = datetime.datetime.now().strftime('_%Y_%m_%d')
 # Global Variables End:
 
 
@@ -50,7 +54,7 @@ def aws_ec2():
     list_of_regions=[]
     for each_reg in all_regions['Regions']:
         list_of_regions.append(each_reg['RegionName'])
-    ins_file=open('output/' + each_prof + '-ec2_invent.csv','w',newline='')
+    ins_file=open('output/' + each_prof + '-ec2_invent' + time_now + '.csv','w',newline='')
     ins_data=csv.writer(ins_file)
     ins_data.writerow(['Name','Instance','IP','MacAddress','Environment','Platform','OS','RunAfterHours','InstanceType'])
     for each_reg in list_of_regions:
@@ -75,8 +79,8 @@ def aws_ec2():
             ins_data.writerow([ins_name,each_in.id,each_in.public_ip_address or each_in.private_ip_address,mac,env or "NotDefined",each_in.platform or 'Linux',"NotDefined",run_af_hrs or 'Yes',each_in.instance_type])
             ec2s_found += 1
         if ec2s_found > 0:
-            print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent.csv\n')
-        exit()
+            print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent' + time_now + '.csv\n')
+            exit()
     ins_file.close()
     exit()
 
