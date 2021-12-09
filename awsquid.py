@@ -35,6 +35,9 @@ def aws_options():
         if sys.argv[3] == "ELB":
             print(aws_elb())
             exit()
+        if sys.argv[3] == "RDS":
+            print(aws_rds())
+            exit()
         elif ((sys.argv[3] != "EC2") and (sys.argv[3] != "ELB")):
             print("\n Invalid task, pls reference usage:")
             print(usage_help_arg())
@@ -136,6 +139,33 @@ def aws_elb():
             print(' --> No Application|Network ELBs found in ' + each_reg)
     ins_file.close()
     exit()
+
+def aws_rds():
+    each_prof = sys.argv[2]
+    print('\n' + each_prof + '\'s RDS Inventory: \n')
+    session=boto3.Session(profile_name=each_prof,region_name=default_region)
+    client=session.client('ec2')
+    all_regions=client.describe_regions()
+    list_of_regions=[]
+    for each_reg in all_regions['Regions']:
+        list_of_regions.append(each_reg['RegionName'])
+        ins_file=open('output/' + each_prof + '-rds_inventory' + time_now + '.csv','w',newline='')
+        ins_data=csv.writer(ins_file)
+        ins_data.writerow(['RDS Name','RDS Type','RDS Created Date'])
+    for each_reg in list_of_regions:
+        session=boto3.Session(profile_name=each_prof,region_name=each_reg)
+        resource=session.client('rds')
+        print("Auditing region",each_reg)
+        rds_found = 0
+        for each in resource.describe_db_instances()['DBInstances']:
+            ins_data.writerow([each['DBInstanceIdentifier'],"unknown","Notsure"])
+            rds_found += 1
+        if rds_found > 0:
+            print(' --> Region ' + each_reg + '\'s AWS RDS inventory file: output/' + each_prof + '-rds_inventory' + time_now + '.csv\n')
+        else:
+            print(' --> No RDS found in ' + each_reg)
+    ins_file.close()
+    exit()
 # AWS Section Ends:
 
 # AZURE Section Begins:
@@ -162,6 +192,7 @@ def usage_help_arg():
     print("\n Usage is case sensitive: python3 awsquid.py MSP TENANT TASK")
     print(" Example: python3 awsquid.py AWS CID# EC2")
     print(" Example: python3 awsquid.py AWS CID# ELB")
+    print(" Example: python3 awsquid.py AWS CID# RDS")
     print(" Example: python3 awsquid.py OCI CID# HELP")
     print(" Example: python3 awsquid.py GCP CID# HELP")
     print(" Example: python3 awsquid.py AZURE CID# HELP\n")
