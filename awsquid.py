@@ -106,7 +106,7 @@ def aws_elb():
             ins_data.writerow([each['LoadBalancerName'],"classic",each['CreatedTime']])
             celbs_found += 1
         if celbs_found > 0:
-            print(' --> Region ', + each_reg + '\'s AWS Classic ELB inventory file: output/', + each_prof + '-classic_elb_inventory' + time_now + '.csv\n')
+            print(' --> Region ' + each_reg + '\'s AWS Classic ELB inventory file: output/' + each_prof + '-classic_elb_inventory' + time_now + '.csv\n')
         else:
             print(' --> No Classic ELBs found in ' + each_reg)
     ins_file.close()
