@@ -80,7 +80,6 @@ def aws_ec2():
             ec2s_found += 1
         if ec2s_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent' + time_now + '.csv\n')
-            exit()
     ins_file.close()
     exit()
 
@@ -121,7 +120,6 @@ def aws_elb():
             elbs_found += 1
         if elbs_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS Application|Network ELB inventory file: output/' + each_prof + '-app_net_elb_inventory' + time_now + '.csv\n')
-            exit()
     ins_file.close()
     exit()
 # AWS Section Ends:
