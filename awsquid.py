@@ -117,7 +117,6 @@ def aws_elb():
         print("Auditing region -",each_reg)
         elbs_found = 0
         for each in resource.describe_load_balancers()['LoadBalancers']:
-            print("       -",each_reg,"-- ELB Name:",each['LoadBalancerName'],"-- ELB Type:",each['Type'])
             ins_data.writerow([each['LoadBalancerName'],each['Type'],each['State']['Code'],each['CreatedTime']])
             elbs_found += 1
         if elbs_found > 0:
