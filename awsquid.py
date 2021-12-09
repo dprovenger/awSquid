@@ -133,7 +133,7 @@ def aws_elb():
         if elbs_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS Application|Network ELB inventory file: output/' + each_prof + '-app_net_elb_inventory' + time_now + '.csv\n')
         else:
-            print(' --> No Applicatio|Network ELBs found in ' + each_reg)
+            print(' --> No Application|Network ELBs found in ' + each_reg)
     ins_file.close()
     exit()
 # AWS Section Ends:
