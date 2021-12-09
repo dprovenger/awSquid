@@ -151,14 +151,14 @@ def aws_rds():
         list_of_regions.append(each_reg['RegionName'])
         ins_file=open('output/' + each_prof + '-rds_inventory' + time_now + '.csv','w',newline='')
         ins_data=csv.writer(ins_file)
-        ins_data.writerow(['RDS Name','RDS Type','RDS Created Date'])
+        ins_data.writerow(['RDS Name','RDS Engine Type','RDS Engine Version','RDS Status','RDS Instance Type','RDS Created Date'])
     for each_reg in list_of_regions:
         session=boto3.Session(profile_name=each_prof,region_name=each_reg)
         resource=session.client('rds')
         print("Auditing region",each_reg)
         rds_found = 0
         for each in resource.describe_db_instances()['DBInstances']:
-            ins_data.writerow([each['DBInstanceIdentifier'],"unknown","Notsure"])
+            ins_data.writerow([each['DBInstanceIdentifier'],each['Engine'],each['EngineVersion'],each['DBInstanceStatus'],each['DBInstanceClass'],each['InstanceCreateTime']])
             rds_found += 1
         if rds_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS RDS inventory file: output/' + each_prof + '-rds_inventory' + time_now + '.csv\n')
