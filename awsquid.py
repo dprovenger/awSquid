@@ -80,6 +80,8 @@ def aws_ec2():
             ec2s_found += 1
         if ec2s_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS EC2 inventory file: output/' + each_prof + '-ec2_invent' + time_now + '.csv\n')
+        else:
+            print(' --> No EC2s found in ' + each_reg)
     ins_file.close()
     exit()
 
@@ -92,12 +94,22 @@ def aws_elb():
     list_of_regions=[]
     for each_reg in all_regions['Regions']:
         list_of_regions.append(each_reg['RegionName'])
+        ins_file=open('output/' + each_prof + '-classic_elb_inventory' + time_now + '.csv','w',newline='')
+        ins_data=csv.writer(ins_file)
+        ins_data.writerow(['ELB Name','ELB Type','ELB Created Date'])
     for each_reg in list_of_regions:
         session=boto3.Session(profile_name=each_prof,region_name=each_reg)
         resource=session.client('elb')
         print("Auditing region",each_reg)
+        celbs_found = 0
         for each in resource.describe_load_balancers()['LoadBalancerDescriptions']:
-            print("       -",each_reg,"-- Classic ELB Name:",each['LoadBalancerName'])
+            ins_data.writerow([each['LoadBalancerName'],"classic",each['CreatedTime']])
+            celbs_found += 1
+        if celbs_found > 0:
+            print(' --> Region ', + each_reg + '\'s AWS Classic ELB inventory file: output/', + each_prof + '-classic_elb_inventory' + time_now + '.csv\n')
+        else:
+            print(' --> No Classic ELBs found in ' + each_reg)
+    ins_file.close()
 
     print('')
     print('\n' + each_prof + '\'s App/Net ELBs Inventory:\n')
@@ -120,6 +132,8 @@ def aws_elb():
             elbs_found += 1
         if elbs_found > 0:
             print(' --> Region ' + each_reg + '\'s AWS Application|Network ELB inventory file: output/' + each_prof + '-app_net_elb_inventory' + time_now + '.csv\n')
+        else:
+            print(' --> No Applicatio|Network ELBs found in ' + each_reg)
     ins_file.close()
     exit()
 # AWS Section Ends:
