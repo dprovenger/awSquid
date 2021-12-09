@@ -108,12 +108,22 @@ def aws_elb():
     list_of_regions=[]
     for each_reg in all_regions['Regions']:
         list_of_regions.append(each_reg['RegionName'])
+        ins_file=open('output/' + each_prof + '-app_net_elb_inventory' + time_now + '.csv','w',newline='')
+        ins_data=csv.writer(ins_file)
+        ins_data.writerow(['ELB Name','ELB Type','ELB State','ELB Created Date'])
     for each_reg in list_of_regions:
         session=boto3.Session(profile_name=each_prof,region_name=each_reg)
         resource=session.client('elbv2')
         print("Auditing region -",each_reg)
+        elbs_found = 0
         for each in resource.describe_load_balancers()['LoadBalancers']:
             print("       -",each_reg,"-- ELB Name:",each['LoadBalancerName'],"-- ELB Type:",each['Type'])
+            ins_data.writerow([each['LoadBalancerName'],each['Type'],each['State']['Code'],each['CreatedTime']])
+            elbs_found += 1
+        if elbs_found > 0:
+            print(' --> Region ' + each_reg + '\'s AWS Application|Network ELB inventory file: output/' + each_prof + '-app_net_elb_inventory' + time_now + '.csv\n')
+            exit()
+    ins_file.close()
     exit()
 # AWS Section Ends:
 
