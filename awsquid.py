@@ -24,7 +24,11 @@ def aws_options():
         print("\n Tenant ID missing, pls reference usage:")
         print(usage_help_arg())
         exit()
-    if sys.argv[2] in tenants:
+    elif len(sys.argv) >= 5:
+        print("\n Too many arguments, pls reference usage:")
+        print(usage_help_arg())
+        exit()
+    elif sys.argv[2] in tenants:
         if len(sys.argv) == 3:
             print("\n Task missing, pls reference usage:")
             print(usage_help_arg())
@@ -38,7 +42,10 @@ def aws_options():
         if sys.argv[3] == "RDS":
             print(aws_rds())
             exit()
-        elif ((sys.argv[3] != "EC2") and (sys.argv[3] != "ELB")):
+        if sys.argv[3] == 'USERS':
+            print(aws_iam())
+            exit()
+        else: 
             print("\n Invalid task, pls reference usage:")
             print(usage_help_arg())
             exit()
@@ -166,24 +173,67 @@ def aws_rds():
             print(' --> No RDS found in ' + each_reg)
     ins_file.close()
     exit()
+
+def aws_iam():
+    each_prof = sys.argv[2]
+    print('\n' + each_prof + '\'s IAM Users Inventory: \n')
+    session=boto3.Session(profile_name=each_prof,region_name=default_region)
+    client=session.client('ec2')
+    all_regions=client.describe_regions()
+    list_of_regions=[]
+    for each_reg in all_regions['Regions']:
+        list_of_regions.append(each_reg['RegionName'])
+        ins_file=open('output/' + each_prof + '-iam_users_inventory' + time_now + '.csv','w',newline='')
+        ins_data=csv.writer(ins_file)
+        ins_data.writerow(['User Name','User ID'])
+    for each_reg in list_of_regions:
+        session=boto3.Session(profile_name=each_prof,region_name=each_reg)
+        resource=session.client('iam')
+        print("Auditing region",each_reg)
+        rds_found = 0
+        for each in resource.list_users()['Users']:
+            ins_data.writerow([each['UserName'],each['UserId']])
+            rds_found += 1
+        if rds_found > 0:
+            print(' --> Region ' + each_reg + '\'s AWS users inventory file: output/' + each_prof + '-iam_users_inventory' + time_now + '.csv\n')
+        else:
+            print(' --> No Users found in ' + each_reg)
+    ins_file.close()
+    exit()
+
 # AWS Section Ends:
 
 # AZURE Section Begins:
 def azure_options():
-    print("\n No Azure options available at this time!\n")
-    exit()
+    if len(sys.argv) >= 5:
+        print("\n Too many arguments, pls reference usage:")
+        print(usage_help_arg())
+        exit()
+    else:
+        print("\n No Azure options available at this time!\n")
+        exit()
 # AZURE Section Ends:
 
 # GCP Section Begins:
 def gcp_options():
-    print("\n No GCP options available at this time!\n")
-    exit()
+    if len(sys.argv) >= 5:
+        print("\n Too many arguments, pls reference usage:")
+        print(usage_help_arg())
+        exit()
+    else:
+        print("\n No GCP options available at this time!\n")
+        exit()
 # GCP Section Ends:
 
 # OCI Section Begins:
 def oci_options ():
-    print("\n No OCI options available at this time!\n")
-    exit()
+    if len(sys.argv) >= 5:
+        print("\n Too many arguments, pls reference usage:")
+        print(usage_help_arg())
+        exit()
+    else:
+        print("\n No OCI options available at this time!\n")
+        exit()
 # OCI Section Ends:
 
 # Section of all MSPs Begins:
@@ -193,6 +243,7 @@ def usage_help_arg():
     print(" Example: python3 awsquid.py AWS CID# EC2")
     print(" Example: python3 awsquid.py AWS CID# ELB")
     print(" Example: python3 awsquid.py AWS CID# RDS")
+    print(" Example: python3 awsquid.py AWS CID# USERS")
     print(" Example: python3 awsquid.py OCI CID# HELP")
     print(" Example: python3 awsquid.py GCP CID# HELP")
     print(" Example: python3 awsquid.py AZURE CID# HELP\n")
@@ -204,13 +255,9 @@ def read_args() -> Dict[str, str]:
         print("\n Arguments missing, pls referene usage:")
         print(usage_help_arg())
         exit()
-    elif len(sys.argv) >= 5:
-        print("\n Too many arguments, pls reference usage:")
-        print(usage_help_arg())
-        exit()
     elif (sys.argv[1] == "AWS"):
-        print(aws_options())
-        exit()
+        print(aws_options()) 
+        exit()  
     elif sys.argv[1] == "AZURE":
         print(azure_options())
         exit()
